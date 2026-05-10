@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Basic RAG | AI Knowledge Assistant</title>
+<meta name="description" content="Retrieval-Augmented Generation assistant powered by InclusionAI Ring-2.6-1T"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<!-- Background orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="layout">
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">🧠</span>
+        <span class="logo-text">BasicRAG</span>
+      </div>
+      <p class="logo-sub">Powered by Ring-2.6-1T</p>
+    </div>
+
+    <div class="status-card" id="statusCard">
+      <div class="status-dot" id="statusDot"></div>
+      <div>
+        <div class="status-label">System Status</div>
+        <div class="status-value" id="statusVal">Loading…</div>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="stat-num" id="chunkCount">—</div>
+        <div class="stat-lbl">Chunks Indexed</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="docCount">—</div>
+        <div class="stat-lbl">Documents</div>
+      </div>
+    </div>
+
+    <div class="section-title">📄 Knowledge Base</div>
+    <ul class="doc-list" id="docList"><li class="doc-item loading-pill">Loading…</li></ul>
+
+    <div class="section-title">⬆️ Upload PDF</div>
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="fileInput" accept=".pdf" hidden/>
+      <div class="upload-icon">📂</div>
+      <div class="upload-text">Drop PDF here or click</div>
+      <div class="upload-sub">Only PDF files • Max 20 MB</div>
+    </div>
+    <div class="upload-status" id="uploadStatus"></div>
+
+    <div class="sidebar-footer">
+      <span>Model: <b>inclusion-ai/ring-2.6-1t</b></span><br/>
+      <span>Embeddings: <b>all-MiniLM-L6-v2</b></span>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="main">
+    <header class="top-bar">
+      <h1 class="page-title">AI Knowledge Assistant</h1>
+      <p class="page-sub">Ask anything — answers are grounded in your documents</p>
+    </header>
+
+    <div class="chat-wrap" id="chatWrap">
+      <!-- Welcome card -->
+      <div class="welcome-card" id="welcomeCard">
+        <div class="welcome-icon">✨</div>
+        <h2>Start a Conversation</h2>
+        <p>Your knowledge base contains documents on <b>AI, Python, Machine Learning, and RAG</b>. Ask me anything about them!</p>
+        <div class="sample-queries">
+          <button class="sample-btn" onclick="prefill('What is Retrieval-Augmented Generation?')">What is RAG?</button>
+          <button class="sample-btn" onclick="prefill('Explain machine learning overfitting')">Overfitting in ML</button>
+          <button class="sample-btn" onclick="prefill('What are Python best practices?')">Python best practices</button>
+          <button class="sample-btn" onclick="prefill('How do vector databases work?')">Vector databases</button>
+        </div>
+      </div>
+      <!-- Messages injected here -->
+    </div>
+
+    <div class="input-bar">
+      <textarea id="queryInput" class="query-input" placeholder="Ask a question about your documents…" rows="1"></textarea>
+      <button id="sendBtn" class="send-btn" onclick="sendQuery()">
+        <span id="sendIcon">➤</span>
+      </button>
+    </div>
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
