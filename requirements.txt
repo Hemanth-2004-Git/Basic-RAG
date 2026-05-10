@@ -1,0 +1,12 @@
+flask
+flask-cors
+werkzeug
+PyPDF2
+sentence-transformers
+faiss-cpu
+numpy
+requests
+reportlab
+python-dotenv
+google-genai
+gunicorn
