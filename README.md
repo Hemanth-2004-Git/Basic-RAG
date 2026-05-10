@@ -33,7 +33,8 @@ A full-stack **Retrieval-Augmented Generation (RAG)** application that lets you 
 │  └────────────────────────────────────┬──────┘  │
 │                                       │          │
 │  ┌────────────────────────────────────▼──────┐  │
-│  │       OpenRouter LLM  (Ring 2.6-1T)       │  │
+│  │       Gemini 2.0 (Primary) LLM      │  │
+│  │  (Falls back to OpenRouter on error)      │  │
 │  │     Grounded answer generation + sources  │  │
 │  └───────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────┘
@@ -75,7 +76,7 @@ basic rag/
 | ✂️ Smart Chunking | 400-word chunks with 60-word overlap for coherent context |
 | 🔢 Vector Embeddings | `all-MiniLM-L6-v2` (384-dim, fast & accurate) |
 | ⚡ FAISS Search | Cosine-similarity search via `IndexFlatIP` on L2-normalised vectors |
-| 🤖 LLM Generation | `inclusion-ai/ring-2.6-1t` via OpenRouter API |
+| 🤖 LLM Generation | **Google Gemini API** (primary) with automatic fallback to **OpenRouter API** on rate limits |
 | 📎 Source Citations | Every answer includes the source PDF filename(s) |
 | 🔁 Live Re-indexing | Uploading a new PDF automatically rebuilds the index without a restart |
 | 🌐 Web UI | Single-page app — no frontend build step required |
@@ -94,7 +95,7 @@ cd "basic rag"
 ### 2. Install Dependencies
 
 ```bash
-pip install flask flask-cors werkzeug PyPDF2 sentence-transformers faiss-cpu numpy requests reportlab
+pip install flask flask-cors werkzeug PyPDF2 sentence-transformers faiss-cpu numpy requests reportlab python-dotenv google-genai
 ```
 
 > **Windows note:** If `faiss-cpu` fails, try `pip install faiss-cpu --no-cache-dir`.
@@ -225,24 +226,26 @@ All key parameters are at the top of `rag_engine.py`:
 
 ---
 
-## 🔑 API Key
+## 🔑 API Keys Configuration
 
-The OpenRouter API key is stored in `rag_engine.py` at `OPENROUTER_API_KEY`. For production use, move it to an environment variable:
+The app securely loads API keys from a `.env` file using `python-dotenv`.
 
-```python
-import os
-OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
+1. Create a file named `.env` in the root folder (`basic rag/`).
+2. Add your keys to it:
+
+```ini
+# Primary: Google Gemini
+# Get your key from: https://aistudio.google.com/app/apikey
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=models/gemini-2.0-flash
+
+# Fallback: OpenRouter
+# Get your key from: https://openrouter.ai/keys
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+OPENROUTER_MODEL=inclusionai/ring-2.6-1t:free
 ```
 
-Then set it in your shell:
-
-```bash
-# Windows PowerShell
-$env:OPENROUTER_API_KEY = "sk-or-v1-..."
-
-# Linux / macOS
-export OPENROUTER_API_KEY="sk-or-v1-..."
-```
+The application will automatically use Gemini by default. If your Gemini quota is exceeded, it will seamlessly fall back to OpenRouter!
 
 ---
 
@@ -250,14 +253,14 @@ export OPENROUTER_API_KEY="sk-or-v1-..."
 
 | Package | Purpose |
 |---|---|
-| `flask` | Web framework & static file serving |
-| `flask-cors` | Cross-Origin Resource Sharing |
-| `werkzeug` | Secure filename handling for uploads |
+| `flask` / `flask-cors` / `werkzeug` | Web framework & API routing |
 | `PyPDF2` | PDF text extraction |
 | `sentence-transformers` | `all-MiniLM-L6-v2` embedding model |
 | `faiss-cpu` | Efficient vector similarity search |
 | `numpy` | Numerical operations & L2 normalisation |
-| `requests` | HTTP calls to OpenRouter API |
+| `google-genai` | Google Gemini official Python SDK |
+| `requests` | HTTP calls to OpenRouter API fallback |
+| `python-dotenv` | Securely loads `.env` variables |
 | `reportlab` | (Dev only) Generate sample PDF documents |
 
 ---
